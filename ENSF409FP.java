@@ -1,4 +1,4 @@
-package ENSF409;
+package edu.ucalgary.ensf409;
 
 import java.sql.*;
 
