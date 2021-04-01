@@ -40,6 +40,8 @@ public class ENSF409FP
 		
 		myFP.createConnection();
 		
+		myFP.close();
+		
 	}
 
 }
