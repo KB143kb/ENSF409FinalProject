@@ -23,9 +23,10 @@ public class ENSF409FP
 	
 	public static void main(String[] args) 
 	{
-		// TODO Auto-generated method stub
-
+		ENSF409FP myFP = new ENSF409FP ();
+		
+		myFP.createConnection();
+		
 	}
 
 }
-//test edit
