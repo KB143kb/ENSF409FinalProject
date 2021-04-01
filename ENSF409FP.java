@@ -21,6 +21,19 @@ public class ENSF409FP
 		}
 	}
 	
+	public void close() 
+	{
+		try 
+		{
+			results.close();
+			dbConnect.close();
+		}
+		catch (SQLException e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) 
 	{
 		ENSF409FP myFP = new ENSF409FP ();
