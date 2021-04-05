@@ -16,6 +16,7 @@ public class Lamp
 		setBase (base);
 		setBulb (bulb);
 		setPrice (price);
+		setManuID (manuID);
 	}
 	
 	public void setID (String id)
@@ -41,6 +42,11 @@ public class Lamp
 	public void setPrice (int price)
 	{
 		this.price = price;
+	}
+	
+	public void setManuID (String manuID)
+	{
+		this.manuID = manuID;
 	}
 	
 	public String getID () 
