@@ -1,6 +1,6 @@
 package edu.ucalgary.ensf409;
 
-public class Filling 
+public class Filing 
 {
 	private String id;
 	private String type;
@@ -10,7 +10,7 @@ public class Filling
 	private int price;
 	private String manuID;
 	
-	public Filling (String id, String type, char rails, char drawers, char cabinet, int price, String manuID)
+	public Filing (String id, String type, char rails, char drawers, char cabinet, int price, String manuID)
 	{
 		setID (id);
 		setType (type);
