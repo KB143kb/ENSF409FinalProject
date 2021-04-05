@@ -2,10 +2,10 @@ package edu.ucalgary.ensf409;
 
 public class Manufacturer
 {
-	String manuID;
-	String name;
-	String phoneNumber;
-	String province;
+	private String manuID;
+	private String name;
+	private String phoneNumber;
+	private String province;
 	
 	public Manufacturer (String manuID, String name, String phoneNumber, String province)
 	{
