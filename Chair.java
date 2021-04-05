@@ -20,6 +20,7 @@ public class Chair
 		setSeat (seat);
 		setCushion (cushion);
 		setPrice (price);
+		setManuID (manuID);
 	}
 	
 	public void setID (String id)
@@ -55,6 +56,11 @@ public class Chair
 	public void setPrice (int price)
 	{
 		this.price = price;
+	}
+	
+	public void setManuID (String manuID)
+	{
+		this.manuID = manuID;
 	}
 	
 	public String getID () 
