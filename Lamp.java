@@ -2,12 +2,12 @@ package edu.ucalgary.ensf409;
 
 public class Lamp 
 {
-	String id;
-	String type;
-	char base;
-	char bulb;
-	int price;
-	String manuID;
+	private String id;
+	private String type;
+	private char base;
+	private char bulb;
+	private int price;
+	private String manuID;
 	
 	public Lamp (String id, String type, char base, char bulb, int price, String manuID)
 	{
