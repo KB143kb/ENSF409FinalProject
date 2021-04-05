@@ -1,5 +1,6 @@
 package edu.ucalgary.ensf409;
 
+
 public class Lamp 
 {
 	private String id;
