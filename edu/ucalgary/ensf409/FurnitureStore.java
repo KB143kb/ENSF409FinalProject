@@ -10,6 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.io.*;
 
 public class FurnitureStore {
 	public String DBURL;
@@ -61,6 +62,9 @@ public class FurnitureStore {
 											chairInventory.getInt("Price"), chairInventory.getString("ManuID")));
 				}
 			}
+			if(chairCombinations.size() == 0){
+				System.out.println("The furniture type you want to order is not available");
+			}
 			myStatement.close();
 			chairInventory.close();
 		}
@@ -85,6 +89,9 @@ public class FurnitureStore {
 												  deskInventory.getString("Top").charAt(0), deskInventory.getString("Drawer").charAt(0),
 												  deskInventory.getInt("Price"), deskInventory.getString("ManuID")));
 				}
+			}
+			if(deskCombinations.size() == 0){
+				System.out.println("The furniture type you want to order is not available");
 			}
 			myStatement.close();
 			deskInventory.close();
@@ -111,6 +118,9 @@ public class FurnitureStore {
 												  filingInventory.getInt("Price"), filingInventory.getString("ManuID")));
 				}
 			}
+			if(filingCombinations.size() == 0){
+				System.out.println("The furniture type you want to order is not available");
+			}
 			myStatement.close();
 			filingInventory.close();
 		}
@@ -135,6 +145,9 @@ public class FurnitureStore {
 												  lampInventory.getString("Bulb").charAt(0), lampInventory.getInt("Price"), lampInventory.getString("ManuID")));
 				}
 			}
+			if(lampCombinations.size() == 0){
+				System.out.println("The furniture type you want to order is not available");
+			}
 			myStatement.close();
 			lampInventory.close();
 		}
@@ -144,7 +157,47 @@ public class FurnitureStore {
 
 		return lampCombinations;
 	}
-	
+
+	public void createOrderForm(String orderRequest, ArrayList<String> itemID, int totalPrice){
+		FileWriter orderForm = null;
+		String outputFileName = "orderform.txt";
+
+		try{
+			//open an output stream for the orderform
+			orderForm = new FileWriter(outputFileName);
+			//User information, left blank for now
+			orderForm.write("Furniture Order Form\n\n");
+			orderForm.write("Faculty Name: \n");
+			orderForm.write("Contact: \n");
+			orderForm.write("Date: \n\n");
+			orderForm.write("Original Request: " + orderRequest + "\n\n");
+			
+			//write the item id numbers to the orderform
+			orderForm.write("Items Ordered\n");
+			for(String temp : itemID){
+				orderForm.write("ID: " + temp + "\n");
+			}
+
+			//write total price to the order form
+			orderForm.write("\nTotal Price: $" + totalPrice + "\n");
+		}
+		catch (IOException e) {
+			System.out.println("I/O exception when trying to write to " + outputFileName);
+			e.printStackTrace();
+		}
+		finally{
+			if(orderForm != null){
+				try{
+					orderForm.close();
+				}
+				catch(IOException e){
+					System.out.println("Couldn't close file " + outputFileName);
+					e.printStackTrace();
+				}
+			}
+		}
+
+	}
 	
 	//used for closing the connection to the inventory database
 	public void close(){
@@ -165,40 +218,48 @@ public class FurnitureStore {
 		String dbURL = "jdbc:mysql://localhost/inventory";
 		String userRequest = "";
 
-		//Prompt user for the inputs to the database
-		/*
-		System.out.print("Enter the URL for the inventory database: ");
-		try{
-			dbURL = scanner.next();
-		}
-		catch(InputMismatchException e){
-			System.out.println(e.getMessage());
-		}
-		System.out.print("Enter the username for the inventory database: ");
-		try{
-			dbUsername = scanner.next();
-		}
-		catch(InputMismatchException e){
-			System.out.println(e.getMessage());
-		}
-		System.out.print("Enter the password for the inventory database: ");
-		try{
-			dbPassword = scanner.next();
-		}
-		catch(InputMismatchException e){
-			System.out.println(e.getMessage());
-		}
-		*/
+		System.out.println("Welcome to the UCalgary Supply Chain Management System");
 
+		//Prompt user for the inputs to the database
+		System.out.println("The current database settings are: " );
+		System.out.println("MySQL URL: " + dbURL);
+		System.out.println("Username: " + dbUsername);
+		System.out.println("Password: " + dbPassword);
+
+		System.out.print("Would you like to change these settings? (Enter yes to input new MySQL settings or no to use the current one) ");
+		userRequest = scanner.nextLine().trim();
+		
+		if(userRequest.compareToIgnoreCase("yes") == 0){
+			System.out.print("Enter the URL for the inventory database: ");
+			try{
+				dbURL = scanner.nextLine().trim();
+			}
+			catch(InputMismatchException e){
+				System.out.println(e.getMessage());
+			}
+			System.out.print("Enter the username for the inventory database: ");
+			try{
+				dbUsername = scanner.nextLine().trim();
+			}
+			catch(InputMismatchException e){
+				System.out.println(e.getMessage());
+			}
+			System.out.print("Enter the password for the inventory database: ");
+			try{
+				dbPassword = scanner.nextLine().trim();
+			}
+			catch(InputMismatchException e){
+				System.out.println(e.getMessage());
+			}
+		}
+		
 		FurnitureStore schoolFurnitureStore = new FurnitureStore(dbURL, dbUsername, dbPassword);
 		schoolFurnitureStore.createConnection();
 		
-		System.out.println("Welcome to the UCalgary Supply Chain Management System");
-
 		while(readingUser){
-			System.out.println("Would you like to order an item? Enter yes to order an item and the quantity or enter no to exit the program. ");
+			System.out.print("Would you like to order an item? (Enter yes to order an item or enter no to exit the program) ");
 			try{
-				userRequest = scanner.nextLine();
+				userRequest = scanner.nextLine().trim();
 			}
 			catch(InputMismatchException e){
 				System.out.println(e.getMessage());
@@ -215,7 +276,7 @@ public class FurnitureStore {
 
 				System.out.print("Please enter the furniture type: ");
 				try{
-					userFurnitureRequest[0] = scanner.nextLine();
+					userFurnitureRequest[0] = scanner.nextLine().trim();
 				}
 				catch(InputMismatchException e){
 					System.out.println(e.getMessage());
@@ -223,7 +284,7 @@ public class FurnitureStore {
 				
 				System.out.print("Please enter the furniture category: ");
 				try{
-					userFurnitureRequest[1] = scanner.nextLine();
+					userFurnitureRequest[1] = scanner.nextLine().trim();
 				}
 				catch(InputMismatchException e){
 					System.out.println(e.getMessage());
@@ -231,21 +292,29 @@ public class FurnitureStore {
 
 				System.out.print("Please enter the quantity: ");
 				try{
-					userQuantity = Integer.parseInt(scanner.nextLine());
+					userQuantity = Integer.parseInt(scanner.nextLine().trim());
 				}
 				catch(InputMismatchException e){
 					System.out.println(e.getMessage());
 				}
 
-				
-				
+				//used for passing to the createOrderFormMethod
+				String furnitureOrdered = userFurnitureRequest[0] + " " + userFurnitureRequest[1] + ", " + Integer.toString(userQuantity);
+				ArrayList<String> itemID = new ArrayList<String>();
+				int totalPrice = 0;
+
 				//check if the furniture category exists with in the store
 				if(userFurnitureRequest[1].compareToIgnoreCase("chair") == 0){
 					ArrayList<Chair> testChair = schoolFurnitureStore.calculateChairPrice(userFurnitureRequest[0], userQuantity);
 					
 					for(int i = 0; i < testChair.size(); i++){
 						System.out.println(testChair.get(i).getID());
+						itemID.add(testChair.get(i).getID());
+						totalPrice += testChair.get(i).getPrice();
 					}
+					
+					//test orderform method
+					schoolFurnitureStore.createOrderForm(furnitureOrdered, itemID, totalPrice);
 				}
 				else if(userFurnitureRequest[1].compareToIgnoreCase("desk") == 0){
 					ArrayList<Desk> testDesk = schoolFurnitureStore.calculateDeskPrice(userFurnitureRequest[0], userQuantity);
@@ -274,6 +343,5 @@ public class FurnitureStore {
 			}
 			userRequest = "";
 		}
-		
 	}
 }
