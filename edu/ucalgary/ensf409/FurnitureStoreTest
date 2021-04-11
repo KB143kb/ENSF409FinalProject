@@ -1,0 +1,61 @@
+package edu.ucalgary.ensf409;
+
+import org.junit.*;
+import static org.junit.Assert.*;
+
+import java.sql.*;
+
+public class FurnitureStoreTest 
+{
+	public final static String DBURL = "jdbc:mysql://localhost/inventory";
+	public final static String USERNAME = "root";
+	public final static String PASSWORD = "Kruti#123";
+	
+	public FurnitureStoreTest() {}
+	
+	@Test
+	public void testCreateConnection() throws SQLException
+	{
+		
+		Connection inventoryConnection = DriverManager.getConnection(DBURL, USERNAME, PASSWORD);
+		assertNotNull(inventoryConnection);
+		
+	}
+	/*
+	@Test(expected=IllegalArgumentException.class)
+	public void testCreateConnection_Exception ()
+	{
+		
+	}*/
+	
+	@Test
+	//Constructor with three arguments, use getDBURL() to test DBURL was set.
+	public void testConstructor3_getDBURL ()
+	{
+		FurnitureStore testObj = new FurnitureStore (DBURL, USERNAME, PASSWORD);
+		assertTrue ("Three argument constructor sets DBURL", testObj.getDBURL().equals(DBURL));
+	}
+	
+	@Test
+	//Constructor with three arguments, use getUSERNAME() to test USERNAME was set.
+	public void testConstructor3_getUSERNAME ()
+	{
+		FurnitureStore testObj = new FurnitureStore (DBURL, USERNAME, PASSWORD);
+		assertTrue ("Three argument constructor sets USERNAME", testObj.getUSERNAME().equals(USERNAME));
+	}
+	
+	@Test
+	//Constructor with three arguments, use getPASSWORD() to test PASSWORD was set.
+	public void testConstructor3_getPASSWORD ()
+	{
+		FurnitureStore testObj = new FurnitureStore (DBURL, USERNAME, PASSWORD);
+		assertTrue ("Three argument constructor sets PASSWORD", testObj.getPASSWORD().equals(PASSWORD));
+	}
+	
+	/*
+	@Test
+	public void testCalculateChairPrice ()
+	{
+		
+	}*/
+}
