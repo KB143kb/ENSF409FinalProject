@@ -35,6 +35,30 @@ public class FurnitureStore {
 		this.PASSWORD = PASSWORD;
 	}
 	
+	//returns DBURL
+	public String getDBURL () 
+	{
+		return this.DBURL;
+	}
+	
+	//returns USERNAME
+	public String getUSERNAME () 
+	{
+		return this.USERNAME;
+	}
+	
+	//returns PASSWORD
+	public String getPASSWORD () 
+	{
+		return this.PASSWORD;
+	}
+	
+	//returns inventoryCooncetion 
+	public Connection getInventoryConnection () 
+	{
+		return this.inventoryConnection;
+	}
+	
 	//initializes the connection the inventory database
 	public void createConnection (){
 		try{
@@ -47,7 +71,7 @@ public class FurnitureStore {
 	}
 
 	//parses the chairs table from the inventory data base and computes the lowest price of the requested furniture
-	public ArrayList<Chair> calculateChairPrice(String furnitureType, int quantity){
+	public ArrayList<Chair> calculateChairPrice(String furnitureType, int quantity) /*throws FurnitureNotAvailableException*/{
 		ArrayList<Chair> chairCombinations = new ArrayList<Chair>();
 		ResultSet chairInventory;
 		try{
@@ -62,12 +86,16 @@ public class FurnitureStore {
 											chairInventory.getInt("Price"), chairInventory.getString("ManuID")));
 				}
 			}
+			
 			if(chairCombinations.size() == 0){
 				System.out.println("The furniture type you want to order is not available");
+				//throw new FurnitureNotAvailableException();
 			}
+
 			myStatement.close();
 			chairInventory.close();
 		}
+		
 		catch(SQLException e){
 			e.printStackTrace();
 		}
@@ -213,8 +241,8 @@ public class FurnitureStore {
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		boolean readingUser = true;
-		String dbUsername = "nathan";
-		String dbPassword = "ensf409";
+		String dbUsername = "root";
+		String dbPassword = "Kruti#123";
 		String dbURL = "jdbc:mysql://localhost/inventory";
 		String userRequest = "";
 
