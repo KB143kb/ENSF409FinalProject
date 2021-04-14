@@ -5,13 +5,13 @@ public class Desk
 {
 	private String id;
 	private String type;
-	private char legs;
-	private char top; 
-	private char drawer;
+	private String legs;
+	private String top; 
+	private String drawer;
 	private int price;
 	private String manuID;
 	
-	public Desk (String id, String type, char legs, char top, char drawer, int price, String manuID)
+	public Desk (String id, String type, String legs, String top, String drawer, int price, String manuID)
 	{
 		setID (id);
 		setType (type);
@@ -32,17 +32,17 @@ public class Desk
 		this.type = type;
 	}
 	
-	public void setLegs (char legs)
+	public void setLegs (String legs)
 	{
 		this.legs = legs;
 	}
 	
-	public void setTop (char top)
+	public void setTop (String top)
 	{
 		this.top = top;
 	}
 	
-	public void setDrawer (char drawer)
+	public void setDrawer (String drawer)
 	{
 		this.drawer = drawer;
 	}
@@ -67,17 +67,17 @@ public class Desk
 		return this.type;
 	}
 	
-	public char getLegs () 
+	public String getLegs () 
 	{
 		return this.legs;
 	}
 	
-	public char getTop () 
+	public String getTop () 
 	{
 		return this.top;
 	}
 	
-	public char getDrawer () 
+	public String getDrawer () 
 	{
 		return this.drawer;
 	}
