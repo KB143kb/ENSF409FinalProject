@@ -20,6 +20,7 @@ public class FurnitureStoreTest
 		{
 			FurnitureStore testObj = new FurnitureStore (DBURL, USERNAME, PASSWORD);
 			assertTrue ("Three argument constructor sets DBURL successfully.", testObj.getDBURL().equals(DBURL));
+			System.out.println("testConstructor3_getDBURL successful.");
 		}
 		
 		//Constructor with three arguments, use getUSERNAME() to test USERNAME was set.
@@ -28,6 +29,7 @@ public class FurnitureStoreTest
 		{
 			FurnitureStore testObj = new FurnitureStore (DBURL, USERNAME, PASSWORD);
 			assertTrue ("Three argument constructor sets USERNAME successfully.", testObj.getUSERNAME().equals(USERNAME));
+			System.out.println("testConstructor3_getUSERNAME successful.");
 		}
 		
 		//Constructor with three arguments, use getPASSWORD() to test PASSWORD was set.
@@ -36,6 +38,7 @@ public class FurnitureStoreTest
 		{
 			FurnitureStore testObj = new FurnitureStore (DBURL, USERNAME, PASSWORD);
 			assertTrue ("Three argument constructor sets PASSWORD successfully.", testObj.getPASSWORD().equals(PASSWORD));
+			System.out.println("testConstructor3_getPASSWORD successful.");
 		}
 		
 		
@@ -47,7 +50,15 @@ public class FurnitureStoreTest
 			schoolFurnitureStore.createConnection();
 			assertNotNull(schoolFurnitureStore.getInventoryConnection());
 			schoolFurnitureStore.close();
+			System.out.println("testCreateConnection successful.");
 		}
+		
+		/*
+		@Test(expected=IllegalArgumentException.class)
+		public void testCreateConnection_Exception ()
+		{
+			
+		}*/
 		
 	//It is important for MySQL code to be refreshed or recreated before Unit Testing the FurnitureStore code. 
 		//Testing whether CalculateChairPrice works after connecting with MySQL.
@@ -59,6 +70,7 @@ public class FurnitureStoreTest
 			ArrayList<Chair> chairResult = schoolFurnitureStore.calculateChairPrice ("Mesh", 1);		
 			assertEquals ("C0942", chairResult.get(0).getID());
 			schoolFurnitureStore.close();
+			System.out.println("testCalculateChairPrice successful.");
 		}
 		
 		////Testing whether CalculateDeskPrice works after connecting with MySQL.
@@ -70,6 +82,7 @@ public class FurnitureStoreTest
 			ArrayList<Desk> deskResult = schoolFurnitureStore.calculateDeskPrice ("Traditional", 1);		
 			assertEquals ("D0890", deskResult.get(0).getID());
 			schoolFurnitureStore.close();
+			System.out.println("testCalculateDeskPrice successful.");
 		}
 		
 		//Testing whether CalculateFilingPrice works after connecting with MySQL.
@@ -81,6 +94,7 @@ public class FurnitureStoreTest
 			ArrayList<Filing> filingResult = schoolFurnitureStore.calculateFilingPrice ("Small", 1);		
 			assertEquals ("F006", filingResult.get(0).getID());
 			schoolFurnitureStore.close();
+			System.out.println("testCalculateFilingPrice successful.");
 		}
 		
 		//Testing whether CalculateLampPrice works after connecting with MySQL.
@@ -92,14 +106,20 @@ public class FurnitureStoreTest
 			ArrayList<Lamp> lampResult = schoolFurnitureStore.calculateLampPrice ("Desk", 1);		
 			assertEquals ("L564", lampResult.get(0).getID());
 			schoolFurnitureStore.close();
+			System.out.println("testCalculateLampPrice successful.");
 		}
-	
-		/*
+		
+		/*		
+		@Test
+		public void testCreateOrderForm ()
+		{
+			
+		}
+		
 		@Test
 		public void testClose () throws SQLException
 		{
 			schoolFurnitureStore.close();
 			assertNull(schoolFurnitureStore.getInventoryConnection());
-		}
-		*/
+		}*/
 }
