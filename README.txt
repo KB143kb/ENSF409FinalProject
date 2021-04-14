@@ -1,7 +1,7 @@
 Students: Nathaniel Lipura, 30037596
           Kruti Bhatt, 30067609
  
-This project takes takes user inputs to calculate the cheapest combination of furniture items
+This project takes user inputs to calculate the cheapest combination of furniture items
 and produces an order form text file after each request. The main project file is FurnitureStore.java.
 The unit tests are in FurnitureStoreTest.java and the commands to run both FurnitureStore.java and 
 FurnitureStoreTest.java are below. 
