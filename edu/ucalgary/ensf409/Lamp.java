@@ -5,12 +5,12 @@ public class Lamp
 {
 	private String id;
 	private String type;
-	private char base;
-	private char bulb;
+	private String base;
+	private String bulb;
 	private int price;
 	private String manuID;
 	
-	public Lamp (String id, String type, char base, char bulb, int price, String manuID)
+	public Lamp (String id, String type, String base, String bulb, int price, String manuID)
 	{
 		setID (id);
 		setType (type);
@@ -30,12 +30,12 @@ public class Lamp
 		this.type = type;
 	}
 	
-	public void setBase (char base)
+	public void setBase (String base)
 	{
 		this.base = base;
 	}
 	
-	public void setBulb (char bulb)
+	public void setBulb (String bulb)
 	{
 		this.bulb = bulb;
 	}
@@ -60,12 +60,12 @@ public class Lamp
 		return this.type;
 	}
 	
-	public char getBase () 
+	public String getBase () 
 	{
 		return this.base;
 	}
 	
-	public char getBulb () 
+	public String getBulb () 
 	{
 		return this.bulb;
 	}
