@@ -14,9 +14,10 @@ import java.util.ArrayList;
 public class FurnitureStoreTest 
 {
 	public final static String DBURL = "jdbc:mysql://localhost/inventory";
-	public final static String USERNAME = "nathan";
-	public final static String PASSWORD = "ensf409";
+	public final static String USERNAME = "root";
+	public final static String PASSWORD = "Kruti#123";
 	public static FurnitureStore schoolFurnitureStore;
+	public final static String outputFileName = "testOrderform.txt";
 	
 	//Constructor with three arguments will be tested.
 		//Constructor with three arguments, use getDBURL() to test DBURL was set.
@@ -58,20 +59,53 @@ public class FurnitureStoreTest
 			System.out.println("testCreateConnection successful.");
 		}
 		
-		//It is important for MySQL code to be refreshed or recreated before Unit Testing the FurnitureStore code. 
-		//Testing whether CalculateChairPrice works after connecting with MySQL.
+		/*
+		@Test(expected=IllegalArgumentException.class)
+		public void testCreateConnection_Exception ()
+		{
+			
+		}*/
+		
+	//It is important for MySQL code to be refreshed or recreated before Unit Testing the FurnitureStore code. 
+	//Testing whether CalculateChairPrice works after connecting with MySQL.
+		//Testing whether CalculateChairPrice.
 		@Test
 		public void testCalculateChairPrice ()
 		{
 			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
 			schoolFurnitureStore.createConnection();
 			ArrayList<Chair> chairResult = schoolFurnitureStore.calculateChairPrice ("Mesh", 1);		
-			assertEquals ("C6748", chairResult.get(0).getID());
+			assertEquals ("C0942", chairResult.get(0).getID());
 			schoolFurnitureStore.close();
 			System.out.println("testCalculateChairPrice successful.");
 		}
 		
-		////Testing whether CalculateDeskPrice works after connecting with MySQL.
+		//Testing whether CalculateChairPrice with overload of quantity.
+		@Test
+		public void testCalculateChairPriceOverloadQuantity ()
+		{
+			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
+			schoolFurnitureStore.createConnection();
+			ArrayList<Chair> chairResult = schoolFurnitureStore.calculateChairPrice ("Mesh", 5);		
+			assertTrue (chairResult.isEmpty());
+			schoolFurnitureStore.close();
+			System.out.println("testCalculateChairPriceOverloadQuantity successful.");
+		}
+		
+		//Testing whether CalculateChairPrice with different quality category.
+		@Test
+		public void testCalculateChairPriceDifferentQuality ()
+		{
+			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
+			schoolFurnitureStore.createConnection();
+			ArrayList<Chair> chairResult = schoolFurnitureStore.calculateChairPrice ("Small", 1);		
+			assertTrue (chairResult.isEmpty());
+			schoolFurnitureStore.close();
+			System.out.println("testCalculateChairPriceDifferentQuality successful.");
+		}
+		
+	//Testing whether CalculateDeskPrice works after connecting with MySQL.
+		//Testing whether CalculateDeskPrice.
 		@Test
 		public void testCalculateDeskPrice ()
 		{
@@ -83,7 +117,32 @@ public class FurnitureStoreTest
 			System.out.println("testCalculateDeskPrice successful.");
 		}
 		
-		//Testing whether CalculateFilingPrice works after connecting with MySQL.
+		//Testing whether CalculateDeskPrice with overload of quantity.
+		@Test
+		public void testCalculateDeskPriceOverloadQuantity ()
+		{
+			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
+			schoolFurnitureStore.createConnection();
+			ArrayList<Desk> deskResult = schoolFurnitureStore.calculateDeskPrice ("Traditional", 8);		
+			assertTrue (deskResult.isEmpty());
+			schoolFurnitureStore.close();
+			System.out.println("testCalculateDeskPriceOverloadQuantity successful.");
+		}
+				
+		//Testing whether CalculateDeskPrice with different quality category.
+		@Test
+		public void testCalculateDeskPriceDifferentQuality ()
+		{
+			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
+			schoolFurnitureStore.createConnection();
+			ArrayList<Desk> deskResult = schoolFurnitureStore.calculateDeskPrice ("Medium", 1);		
+			assertTrue (deskResult.isEmpty());
+			schoolFurnitureStore.close();
+			System.out.println("testCalculateDeskPriceDifferentQuality successful.");
+		}
+		
+	//Testing whether CalculateFilingPrice works after connecting with MySQL.
+		//Testing whether CalculateFilingPrice.
 		@Test
 		public void testCalculateFilingPrice ()
 		{
@@ -95,7 +154,32 @@ public class FurnitureStoreTest
 			System.out.println("testCalculateFilingPrice successful.");
 		}
 		
+		//Testing whether CalculateFilingPrice with overload of quantity.
+		@Test
+		public void testCalculateFilingPriceOverloadQuantity ()
+		{
+			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
+			schoolFurnitureStore.createConnection();
+			ArrayList<Filing> filingResult = schoolFurnitureStore.calculateFilingPrice ("Small", 8);		
+			assertTrue (filingResult.isEmpty());
+			schoolFurnitureStore.close();
+			System.out.println("testCalculateFilingPriceOverloadQuantity successful.");
+		}
+						
+		//Testing whether CalculateFilingPrice with different quality category.
+		@Test
+		public void testCalculateFilingPriceDifferentQuality ()
+		{
+			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
+			schoolFurnitureStore.createConnection();
+			ArrayList<Filing> filingResult = schoolFurnitureStore.calculateFilingPrice ("Mesh", 1);		
+			assertTrue (filingResult.isEmpty());
+			schoolFurnitureStore.close();
+			System.out.println("testCalculateFilingPriceDifferentQuality successful.");
+		}
+		
 		//Testing whether CalculateLampPrice works after connecting with MySQL.
+		//Testing whether CalculateLampPrice.
 		@Test
 		public void testCalculateLampPrice ()
 		{
@@ -107,4 +191,38 @@ public class FurnitureStoreTest
 			System.out.println("testCalculateLampPrice successful.");
 		}
 		
+		//Testing whether CalculateLampPrice with overload of quantity.
+		@Test
+		public void testCalculateLampPriceOverloadQuantity ()
+		{
+			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
+			schoolFurnitureStore.createConnection();
+			ArrayList<Lamp> lampResult = schoolFurnitureStore.calculateLampPrice ("Desk", 8);		
+			assertTrue (lampResult.isEmpty());
+			schoolFurnitureStore.close();
+			System.out.println("testCalculateLampPriceOverloadQuantity successful.");
+		}
+								
+		//Testing whether CalculateLampPrice with different quality category.
+		@Test
+		public void testCalculateLampPriceDifferentQuality ()
+		{
+			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
+			schoolFurnitureStore.createConnection();
+			ArrayList<Lamp> lampResult = schoolFurnitureStore.calculateLampPrice ("Medium", 1);		
+			assertTrue (lampResult.isEmpty());
+			schoolFurnitureStore.close();
+			System.out.println("testCalculateLampPriceDifferentQuality successful.");
+		}
+		
+	//Testing whether MySQL was successfully closed after connecting. User might need to change USERNAME/PASSWORD 
+	//as well as DBURL according to their device. 
+		@Test
+		public void testClose () throws SQLException
+		{
+			schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
+			schoolFurnitureStore.createConnection();
+			schoolFurnitureStore.close();
+			assertNull(schoolFurnitureStore.getInventoryConnection());
+		}
 }
