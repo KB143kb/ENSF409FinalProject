@@ -4,13 +4,13 @@ public class Filing
 {
 	private String id;
 	private String type;
-	private char rails;
-	private char drawers;
-	private char cabinet;
+	private String rails;
+	private String drawers;
+	private String cabinet;
 	private int price;
 	private String manuID;
 	
-	public Filing (String id, String type, char rails, char drawers, char cabinet, int price, String manuID)
+	public Filing (String id, String type, String rails, String drawers, String cabinet, int price, String manuID)
 	{
 		setID (id);
 		setType (type);
@@ -31,17 +31,17 @@ public class Filing
 		this.type = type;
 	}
 	
-	public void setRails (char rails)
+	public void setRails (String rails)
 	{
 		this.rails = rails;
 	}
 	
-	public void setDrawers (char drawers)
+	public void setDrawers (String drawers)
 	{
 		this.drawers = drawers;
 	}
 	
-	public void setCabinet (char cabinet)
+	public void setCabinet (String cabinet)
 	{
 		this.cabinet = cabinet;
 	}
@@ -66,17 +66,17 @@ public class Filing
 		return this.type;
 	}
 	
-	public char getRails () 
+	public String getRails () 
 	{
 		return this.rails;
 	}
 	
-	public char getDrawers () 
+	public String getDrawers () 
 	{
 		return this.drawers;
 	}
 	
-	public char getCabinet () 
+	public String getCabinet () 
 	{
 		return this.cabinet;
 	}
