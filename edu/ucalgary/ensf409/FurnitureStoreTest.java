@@ -59,13 +59,6 @@ public class FurnitureStoreTest
 			System.out.println("testCreateConnection successful.");
 		}
 		
-		/*
-		@Test(expected=IllegalArgumentException.class)
-		public void testCreateConnection_Exception ()
-		{
-			
-		}*/
-		
 	//It is important for MySQL code to be refreshed or recreated before Unit Testing the FurnitureStore code. 
 	//Testing whether CalculateChairPrice works after connecting with MySQL.
 		//Testing whether CalculateChairPrice.
