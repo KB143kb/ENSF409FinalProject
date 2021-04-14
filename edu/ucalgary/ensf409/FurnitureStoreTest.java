@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class FurnitureStoreTest 
 {
 	public final static String DBURL = "jdbc:mysql://localhost/inventory";
-	public final static String USERNAME = "nathan";
+	public final static String USERNAME = "scm";
 	public final static String PASSWORD = "ensf409";
 	public static FurnitureStore schoolFurnitureStore;
 	public final static String outputFileName = "testOrderform.txt";
