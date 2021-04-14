@@ -5,14 +5,14 @@ public class Chair
 {
 	private String id;
 	private String type;
-	private char legs;
-	private char arms;
-	private char seat;
-	private char cushion;
+	private String legs;
+	private String arms;
+	private String seat;
+	private String cushion;
 	private int price;
 	private String manuID;
 	
-	public Chair (String id, String type, char legs, char arms, char seat, char cushion, int price, String manuID)
+	public Chair (String id, String type, String legs, String arms, String seat, String cushion, int price, String manuID)
 	{
 		setID (id);
 		setType (type);
@@ -34,22 +34,22 @@ public class Chair
 		this.type = type;
 	}
 	
-	public void setLegs (char legs)
+	public void setLegs (String legs)
 	{
 		this.legs = legs;
 	}
 	
-	public void setArms (char arms)
+	public void setArms (String arms)
 	{
 		this.arms = arms;
 	}
 	
-	public void setSeat (char seat)
+	public void setSeat (String seat)
 	{
 		this.seat = seat;
 	}
 	
-	public void setCushion (char cushion)
+	public void setCushion (String cushion)
 	{
 		this.cushion = cushion;
 	}
@@ -74,22 +74,22 @@ public class Chair
 		return this.type;
 	}
 	
-	public char getLegs () 
+	public String getLegs () 
 	{
 		return this.legs;
 	}
 	
-	public char getArms () 
+	public String getArms () 
 	{
 		return this.arms;
 	}
 	
-	public char getSeat () 
+	public String getSeat () 
 	{
 		return this.seat;
 	}
 	
-	public char getCushion () 
+	public String getCushion () 
 	{
 		return this.cushion;
 	}
