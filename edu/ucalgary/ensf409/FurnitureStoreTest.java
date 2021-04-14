@@ -75,7 +75,7 @@ public class FurnitureStoreTest
 			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
 			schoolFurnitureStore.createConnection();
 			ArrayList<Chair> chairResult = schoolFurnitureStore.calculateChairPrice ("Mesh", 1);		
-			assertEquals ("C0942", chairResult.get(0).getID());
+			assertEquals ("C6748", chairResult.get(0).getID());
 			schoolFurnitureStore.close();
 			System.out.println("testCalculateChairPrice successful.");
 		}
