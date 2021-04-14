@@ -8,8 +8,10 @@ package edu.ucalgary.ensf409;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+
 import java.io.*;
 
 public class FurnitureStore {
@@ -22,8 +24,9 @@ public class FurnitureStore {
 	private ResultSet deskInventory;
 	private ResultSet filingInventory;
 	private ResultSet lampInventory;
-	private ResultSet manufacturerList;
 	*/
+	private ArrayList<Manufacturer> manufacturerList = new ArrayList<Manufacturer>();
+	
 	
 	//0 argument constructor
 	public FurnitureStore(){}
@@ -35,44 +38,45 @@ public class FurnitureStore {
 		this.PASSWORD = PASSWORD;
 	}
 	
-	//returns DBURL
-	public String getDBURL () 
-	{
-		return this.DBURL;
-	}
-	
-	//returns USERNAME
-	public String getUSERNAME () 
-	{
-		return this.USERNAME;
-	}
-	
-	//returns PASSWORD
-	public String getPASSWORD () 
-	{
-		return this.PASSWORD;
-	}
-	
-	//returns inventoryCooncetion 
-	public Connection getInventoryConnection () 
-	{
-		return this.inventoryConnection;
-	}
+	//return DBURL
+	public String getDBURL () {return this.DBURL;}
+		
+	//return USERNAME
+	public String getUSERNAME () {return this.USERNAME;}
+		
+	//return PASSWORD
+	public String getPASSWORD () {return this.PASSWORD;}
+		
+	//return inventoryConnection
+	public Connection getInventoryConnection () {return this.inventoryConnection;}
 	
 	//initializes the connection the inventory database
 	public void createConnection (){
 		try{
 			inventoryConnection = DriverManager.getConnection(this.DBURL, this.USERNAME, this.PASSWORD);
+			
+			//initialize manufacturing resultset
+			Statement myStatement = inventoryConnection.createStatement();
+			ResultSet manufacturerInventory = myStatement.executeQuery("SELECT * FROM manufacturer");
+
+			while(manufacturerInventory.next()){
+				manufacturerList.add(new Manufacturer(manufacturerInventory.getString("ManuID"), manufacturerInventory.getString("Name"), 
+													  manufacturerInventory.getString("Phone"), manufacturerInventory.getString("Province")));
+			}
+			myStatement.close();
+			manufacturerInventory.close();
 		}
 		
 		catch (SQLException e){
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 
 	//parses the chairs table from the inventory data base and computes the lowest price of the requested furniture
-	public ArrayList<Chair> calculateChairPrice(String furnitureType, int quantity) /*throws FurnitureNotAvailableException*/{
-		ArrayList<Chair> chairCombinations = new ArrayList<Chair>();
+	public ArrayList<Chair> calculateChairPrice(String furnitureType, int quantity){
+		ArrayList<Chair> orderList = new ArrayList<Chair>();
+		ArrayList<Chair> chairList = new ArrayList<Chair>();
 		ResultSet chairInventory;
 		try{
 			Statement myStatement = inventoryConnection.createStatement();
@@ -81,30 +85,161 @@ public class FurnitureStore {
 			//adds a new chair object to the chair combinations arraylist
 			while(chairInventory.next()){
 				if(chairInventory.getString("Type").compareToIgnoreCase(furnitureType) == 0){
-					chairCombinations.add(new Chair(chairInventory.getString("ID"), chairInventory.getString("Type"), chairInventory.getString("Legs").charAt(0),
-											chairInventory.getString("Arms").charAt(0), chairInventory.getString("Seat").charAt(0), chairInventory.getString("Cushion").charAt(0),
+					chairList.add(new Chair(chairInventory.getString("ID"), chairInventory.getString("Type"), chairInventory.getString("Legs"),
+											chairInventory.getString("Arms"), chairInventory.getString("Seat"), chairInventory.getString("Cushion"),
 											chairInventory.getInt("Price"), chairInventory.getString("ManuID")));
 				}
 			}
-			
-			if(chairCombinations.size() == 0){
+			if(chairList.size() == 0){
 				System.out.println("The furniture type you want to order is not available");
-				//throw new FurnitureNotAvailableException();
+				myStatement.close();
+				chairInventory.close();
+				orderList.clear();
+				return orderList;
 			}
-
 			myStatement.close();
 			chairInventory.close();
 		}
-		
 		catch(SQLException e){
 			e.printStackTrace();
 		}
+		
+		ArrayList<ArrayList<Chair>> totalCombo = new ArrayList<ArrayList<Chair>>();
+		int n = chairList.size();
+		//find every combination of items in the list of lamp items
+		//i <= 2 since we only need 4 components
+		for(int i = 1; i <= 4; i++){
+			totalCombo.addAll(chairCombinations(chairList, n, i));
+		}
 
-		return chairCombinations;
+		ArrayList<ArrayList<Chair>> componentCombos = new ArrayList<ArrayList<Chair>>();
+		//find all the combinations that satisfy all the components
+		for(ArrayList<Chair> chairCombo : totalCombo){
+			//counters for components are used for checking to see if the combination
+			//can satisfy the requested quantity
+			boolean legsFound = false;
+			int legsCount = 0;
+			boolean armsFound = false;
+			int armsCount = 0;
+			boolean seatFound = false;
+			int seatCount = 0;
+			boolean cushionFound = false;
+			int cushionCount = 0;
+			
+			//search the current combination for legs
+			for(Chair chr : chairCombo){
+				if(chr.getLegs().compareToIgnoreCase("Y") == 0){
+					legsFound = true;
+					legsCount++;
+				}
+			}
+			//search the current combination for arms
+			for(Chair chr : chairCombo){
+				if(chr.getArms().compareToIgnoreCase("Y") == 0){
+					armsFound = true;
+					armsCount++;
+				}
+			}
+			//search the current combination for seat
+			for(Chair chr : chairCombo){
+				if(chr.getSeat().compareToIgnoreCase("Y") == 0){
+					seatFound = true;
+					seatCount++;
+				}
+			}
+			//search the current combination for cushion
+			for(Chair chr : chairCombo){
+				if(chr.getCushion().compareToIgnoreCase("Y") == 0){
+					cushionFound = true;
+					cushionCount++;
+				}
+			}
+			//if both components are found, add to componentCombos
+			if(legsFound && armsFound && seatFound && cushionFound && 
+			   legsCount >= quantity && armsCount >= quantity && seatCount >= quantity && cushionCount >= quantity){
+				componentCombos.add(chairCombo);
+			}
+		}
+		//if combinations with all components were found, sort them to get the
+		//lowest price
+		if(componentCombos.size() > 0){
+			//search for the combinations with the lowest price
+			//sort the all the combonations and add the first elements to a list of size quantity
+			for(int i = 0; i < componentCombos.size(); i++){
+				ArrayList<Chair> chairComboI = componentCombos.get(i);
+				int priceI = 0;
+				//calculate the price for combination i
+				for(Chair chr : chairComboI){
+					priceI += chr.getPrice();
+				}
+				//sort the array by the smallest total price
+				for(int j = i + 1; j < componentCombos.size(); j++){
+					ArrayList<Chair> chairComboJ = componentCombos.get(j);
+					int priceJ = 0;
+					//calculate the price for combination j
+					for(Chair chr : chairComboJ){
+						priceJ += chr.getPrice();
+					}
+					
+					if(priceI > priceJ){
+						//swap elements i and j
+						Collections.swap(componentCombos, i, j);
+					}
+				}
+			}
+			//add the items from the first combination to the orderList
+			for(Chair chr : componentCombos.get(0)){
+				orderList.add(chr);
+			}
+		}
+		else{
+			System.out.println("Your order cannot be fulfilled based on our inventory");
+			System.out.println("The suggested manufacturers are: ");
+
+			for(Manufacturer manu : this.manufacturerList){
+				System.out.println(manu.getName());
+			}
+			//return empty orderList
+			orderList.clear();
+		}
+		
+		return orderList;
+	}
+	
+	public ArrayList<ArrayList<Chair>> chairCombinations(ArrayList<Chair> chairArray, int n, int r){
+		ArrayList<Chair> tempData = new ArrayList<Chair>();
+		ArrayList<ArrayList<Chair>> partialChairList = new ArrayList<ArrayList<Chair>>();
+
+		combinationChairUtil(chairArray, tempData, partialChairList, 0, n - 1, 0, r);
+		return partialChairList;
 	}
 
+	public void combinationChairUtil(ArrayList<Chair> arr, ArrayList<Chair> tempData, ArrayList<ArrayList<Chair>> partialList, int start, int end, int index, int r){
+		//current combination is ready to be added
+		if(index == r){
+			ArrayList<Chair> tempChairArray = new ArrayList<Chair>();
+			
+			for(int i = 0; i < r; i++){
+				tempChairArray.add(tempData.get(i));
+			}
+			partialList.add(tempChairArray);
+
+			return;
+		}
+		// replace index with all possible elements. The condition
+        // "end-i+1 >= r-index" makes sure that including one element
+        // at index will make a combination with remaining elements
+        // at remaining positions
+		for (int i = start; i <= end && end - i + 1 >= r - index; i++){
+            tempData.add(index, arr.get(i));
+            //combinationTest.add(data);
+            combinationChairUtil(arr, tempData, partialList, i + 1, end, index + 1, r);
+        }
+	}
+	//parses the desk table from the inventory data base and computes the lowest price of the requested furniture
 	public ArrayList<Desk> calculateDeskPrice(String furnitureType, int quantity){
-		ArrayList<Desk> deskCombinations = new ArrayList<Desk>();
+		ArrayList<Desk> deskList = new ArrayList<Desk>();
+		ArrayList<Desk> orderList = new ArrayList<Desk>();
 		ResultSet deskInventory;
 		try{
 			Statement myStatement = inventoryConnection.createStatement();
@@ -113,13 +248,17 @@ public class FurnitureStore {
 			//adds a new chair object to the chair combinations arraylist
 			while(deskInventory.next()){
 				if(deskInventory.getString("Type").compareToIgnoreCase(furnitureType) == 0){
-					deskCombinations.add(new Desk(deskInventory.getString("ID"), deskInventory.getString("Type"), deskInventory.getString("Legs").charAt(0),
-												  deskInventory.getString("Top").charAt(0), deskInventory.getString("Drawer").charAt(0),
-												  deskInventory.getInt("Price"), deskInventory.getString("ManuID")));
+					deskList.add(new Desk(deskInventory.getString("ID"), deskInventory.getString("Type"), deskInventory.getString("Legs"),
+										  deskInventory.getString("Top"), deskInventory.getString("Drawer"), deskInventory.getInt("Price"), deskInventory.getString("ManuID")));
 				}
 			}
-			if(deskCombinations.size() == 0){
+			if(deskList.size() == 0){
 				System.out.println("The furniture type you want to order is not available");
+				myStatement.close();
+				deskInventory.close();
+				orderList.clear();
+				
+				return orderList;
 			}
 			myStatement.close();
 			deskInventory.close();
@@ -128,11 +267,131 @@ public class FurnitureStore {
 			e.printStackTrace();
 		}
 
-		return deskCombinations;
+		ArrayList<ArrayList<Desk>> totalCombo = new ArrayList<ArrayList<Desk>>();
+		int n = deskList.size();
+		//find every combination of items in the list of lamp items
+		//i <= 2 since we only need 4 components
+		for(int i = 1; i <= 4; i++){
+			totalCombo.addAll(deskCombinations(deskList, n, i));
+		}
+
+		ArrayList<ArrayList<Desk>> componentCombos = new ArrayList<ArrayList<Desk>>();
+		//find all the combinations that satisfy all the components
+		for(ArrayList<Desk> deskCombo : totalCombo){
+			//counters for components are used for checking to see if the combination
+			//can satisfy the requested quantity
+			boolean legsFound = false;
+			int legsCount = 0;
+			boolean topFound = false;
+			int topCount = 0;
+			boolean drawerFound = false;
+			int drawerCount = 0;
+			
+			//search the current combination for legs
+			for(Desk dsk : deskCombo){
+				if(dsk.getLegs().compareToIgnoreCase("Y") == 0){
+					legsFound = true;
+					legsCount++;
+				}
+			}
+			//search the current combination for arms
+			for(Desk dsk : deskCombo){
+				if(dsk.getTop().compareToIgnoreCase("Y") == 0){
+					topFound = true;
+					topCount++;
+				}
+			}
+			//search the current combination for drawer
+			for(Desk dsk : deskCombo){
+				if(dsk.getDrawer().compareToIgnoreCase("Y") == 0){
+					drawerFound = true;
+					drawerCount++;
+				}
+			}
+			//if both components are found, add to componentCombos
+			if(legsFound && topFound && drawerFound && legsCount >= quantity && topCount >= quantity && drawerCount >= quantity){
+				componentCombos.add(deskCombo);
+			}
+		}
+		//if combinations with all components were found, sort them to get the
+		//lowest price
+		if(componentCombos.size() > 0){
+			//search for the combinations with the lowest price
+			//sort the all the combonations and add the first elements to a list of size quantity
+			for(int i = 0; i < componentCombos.size(); i++){
+				ArrayList<Desk> deskComboI = componentCombos.get(i);
+				int priceI = 0;
+				//calculate the price for combination i
+				for(Desk dsk : deskComboI){
+					priceI += dsk.getPrice();
+				}
+				//sort the array by the smallest total price
+				for(int j = i + 1; j < componentCombos.size(); j++){
+					ArrayList<Desk> deskComboJ = componentCombos.get(j);
+					int priceJ = 0;
+					//calculate the price for combination j
+					for(Desk dsk : deskComboJ){
+						priceJ += dsk.getPrice();
+					}
+					
+					if(priceI > priceJ){
+						//swap elements i and j
+						Collections.swap(componentCombos, i, j);
+					}
+				}
+			}
+			//add the items from the first combination to the orderList
+			for(Desk dsk : componentCombos.get(0)){
+				orderList.add(dsk);
+			}
+		}
+		else{
+			System.out.println("Your order cannot be fulfilled based on our inventory");
+			System.out.println("The suggested manufacturers are: ");
+
+			for(Manufacturer manu : this.manufacturerList){
+				System.out.println(manu.getName());
+			}
+			//return empty orderList
+			orderList.clear();
+		}
+		return orderList;
 	}
 
+	public ArrayList<ArrayList<Desk>> deskCombinations(ArrayList<Desk> deskArray, int n, int r){
+		ArrayList<Desk> tempData = new ArrayList<Desk>();
+		ArrayList<ArrayList<Desk>> partialDeskList = new ArrayList<ArrayList<Desk>>();
+
+		combinationDeskUtil(deskArray, tempData, partialDeskList, 0, n - 1, 0, r);
+		return partialDeskList;
+	}
+
+	public void combinationDeskUtil(ArrayList<Desk> arr, ArrayList<Desk> tempData, ArrayList<ArrayList<Desk>> partialList, int start, int end, int index, int r){
+		//current combination is ready to be added
+		if(index == r){
+			ArrayList<Desk> tempDeskArray = new ArrayList<Desk>();
+			
+			for(int i = 0; i < r; i++){
+				tempDeskArray.add(tempData.get(i));
+			}
+			partialList.add(tempDeskArray);
+
+			return;
+		}
+		// replace index with all possible elements. The condition
+        // "end-i+1 >= r-index" makes sure that including one element
+        // at index will make a combination with remaining elements
+        // at remaining positions
+		for (int i = start; i <= end && end - i + 1 >= r - index; i++){
+            tempData.add(index, arr.get(i));
+            //combinationTest.add(data);
+            combinationDeskUtil(arr, tempData, partialList, i + 1, end, index + 1, r);
+        }
+	}
+	//parses the filing table from the inventory data base and computes the lowest price of the requested furniture
 	public ArrayList<Filing> calculateFilingPrice(String furnitureType, int quantity){
-		ArrayList<Filing> filingCombinations = new ArrayList<Filing>();
+		ArrayList<Filing> filingList = new ArrayList<Filing>();
+		ArrayList<Filing> orderList = new ArrayList<Filing>();
 		ResultSet filingInventory;
 		try{
 			Statement myStatement = inventoryConnection.createStatement();
@@ -141,13 +400,18 @@ public class FurnitureStore {
 			//adds a new chair object to the chair combinations arraylist
 			while(filingInventory.next()){
 				if(filingInventory.getString("Type").compareToIgnoreCase(furnitureType) == 0){
-					filingCombinations.add(new Filing(filingInventory.getString("ID"), filingInventory.getString("Type"), filingInventory.getString("Rails").charAt(0),
-												  filingInventory.getString("Drawers").charAt(0), filingInventory.getString("Cabinet").charAt(0),
-												  filingInventory.getInt("Price"), filingInventory.getString("ManuID")));
+					filingList.add(new Filing(filingInventory.getString("ID"), filingInventory.getString("Type"), filingInventory.getString("Rails"),
+													  filingInventory.getString("Drawers"), filingInventory.getString("Cabinet"), filingInventory.getInt("Price"), 
+													  filingInventory.getString("ManuID")));
 				}
 			}
-			if(filingCombinations.size() == 0){
+			if(filingList.size() == 0){
 				System.out.println("The furniture type you want to order is not available");
+				myStatement.close();
+				filingInventory.close();
+				orderList.clear();
+
+				return orderList;
 			}
 			myStatement.close();
 			filingInventory.close();
@@ -156,11 +420,132 @@ public class FurnitureStore {
 			e.printStackTrace();
 		}
 
-		return filingCombinations;
+		ArrayList<ArrayList<Filing>> totalCombo = new ArrayList<ArrayList<Filing>>();
+		int n = filingList.size();
+		//find every combination of items in the list of lamp items
+		//i <= 2 since we only need 4 components
+		for(int i = 1; i <= 4; i++){
+			totalCombo.addAll(filingCombinations(filingList, n, i));
+		}
+
+		ArrayList<ArrayList<Filing>> componentCombos = new ArrayList<ArrayList<Filing>>();
+		//find all the combinations that satisfy all the components
+		for(ArrayList<Filing> filingCombo : totalCombo){
+			//counters for components are used for checking to see if the combination
+			//can satisfy the requested quantity
+			boolean railsFound = false;
+			int railsCount = 0;
+			boolean drawersFound = false;
+			int drawersCount = 0;
+			boolean cabinetFound = false;
+			int cabinetCount = 0;
+			
+			//search the current combination for rails
+			for(Filing flg : filingCombo){
+				if(flg.getRails().compareToIgnoreCase("Y") == 0){
+					railsFound = true;
+					railsCount++;
+				}
+			}
+			//search the current combination for drawers
+			for(Filing flg : filingCombo){
+				if(flg.getDrawers().compareToIgnoreCase("Y") == 0){
+					drawersFound = true;
+					drawersCount++;
+				}
+			}
+			//search the current combination for cabinet
+			for(Filing flg : filingCombo){
+				if(flg.getCabinet().compareToIgnoreCase("Y") == 0){
+					cabinetFound = true;
+					cabinetCount++;
+				}
+			}
+			//if both components are found, add to componentCombos
+			if(railsFound && drawersFound && cabinetFound && railsCount >= quantity && drawersCount >= quantity && cabinetCount >= quantity){
+				componentCombos.add(filingCombo);
+			}
+		}
+		//if combinations with all components were found, sort them to get the
+		//lowest price
+		if(componentCombos.size() > 0){
+			//search for the combinations with the lowest price
+			//sort the all the combonations and add the first elements to a list of size quantity
+			for(int i = 0; i < componentCombos.size(); i++){
+				ArrayList<Filing> filingComboI = componentCombos.get(i);
+				int priceI = 0;
+				//calculate the price for combination i
+				for(Filing flg : filingComboI){
+					priceI += flg.getPrice();
+				}
+				//sort the array by the smallest total price
+				for(int j = i + 1; j < componentCombos.size(); j++){
+					ArrayList<Filing> filingComboJ = componentCombos.get(j);
+					int priceJ = 0;
+					//calculate the price for combination j
+					for(Filing flg : filingComboJ){
+						priceJ += flg.getPrice();
+					}
+					
+					if(priceI > priceJ){
+						//swap elements i and j
+						Collections.swap(componentCombos, i, j);
+					}
+				}
+			}
+			//add the items from the first combination to the orderList
+			for(Filing dsk : componentCombos.get(0)){
+				orderList.add(dsk);
+			}
+		}
+		else{
+			System.out.println("Your order cannot be fulfilled based on our inventory");
+			System.out.println("The suggested manufacturers are: ");
+
+			for(Manufacturer manu : this.manufacturerList){
+				System.out.println(manu.getName());
+			}
+			//return empty orderList
+			orderList.clear();
+		}
+
+		return orderList;
 	}
 
+	public ArrayList<ArrayList<Filing>> filingCombinations(ArrayList<Filing> lampArray, int n, int r){
+		ArrayList<Filing> tempData = new ArrayList<Filing>();
+		ArrayList<ArrayList<Filing>> partialFilingList = new ArrayList<ArrayList<Filing>>();
+
+		combinationFilingUtil(lampArray, tempData, partialFilingList, 0, n - 1, 0, r);
+		return partialFilingList;
+	}
+
+	public void combinationFilingUtil(ArrayList<Filing> arr, ArrayList<Filing> tempData, ArrayList<ArrayList<Filing>> partialList, int start, int end, int index, int r){
+		//current combination is ready to be added
+		if(index == r){
+			ArrayList<Filing> tempFilingArray = new ArrayList<Filing>();
+			
+			for(int i = 0; i < r; i++){
+				tempFilingArray.add(tempData.get(i));
+			}
+			partialList.add(tempFilingArray);
+
+			return;
+		}
+		// replace index with all possible elements. The condition
+        // "end-i+1 >= r-index" makes sure that including one element
+        // at index will make a combination with remaining elements
+        // at remaining positions
+		for (int i = start; i <= end && end - i + 1 >= r - index; i++){
+            tempData.add(index, arr.get(i));
+            //combinationTest.add(data);
+            combinationFilingUtil(arr, tempData, partialList, i + 1, end, index + 1, r);
+        }
+	}	
+	//parses the lamp table from the inventory data base and computes the lowest price of the requested furniture
 	public ArrayList<Lamp> calculateLampPrice(String furnitureType, int quantity){
-		ArrayList<Lamp> lampCombinations = new ArrayList<Lamp>();
+		ArrayList<Lamp> orderList = new ArrayList<Lamp>();
+		ArrayList<Lamp> lampsList = new ArrayList<Lamp>();
 		ResultSet lampInventory;
 		try{
 			Statement myStatement = inventoryConnection.createStatement();
@@ -169,12 +554,16 @@ public class FurnitureStore {
 			//adds a new chair object to the chair combinations arraylist
 			while(lampInventory.next()){
 				if(lampInventory.getString("Type").compareToIgnoreCase(furnitureType) == 0){
-					lampCombinations.add(new Lamp(lampInventory.getString("ID"), lampInventory.getString("Type"), lampInventory.getString("Base").charAt(0),
-												  lampInventory.getString("Bulb").charAt(0), lampInventory.getInt("Price"), lampInventory.getString("ManuID")));
+					lampsList.add(new Lamp(lampInventory.getString("ID"), lampInventory.getString("Type"), lampInventory.getString("Base"),
+										   lampInventory.getString("Bulb"), lampInventory.getInt("Price"), lampInventory.getString("ManuID")));
 				}
 			}
-			if(lampCombinations.size() == 0){
+			if(lampsList.size() == 0){
 				System.out.println("The furniture type you want to order is not available");
+				myStatement.close();
+				lampInventory.close();
+				orderList.clear();
+				return orderList;
 			}
 			myStatement.close();
 			lampInventory.close();
@@ -182,14 +571,137 @@ public class FurnitureStore {
 		catch(SQLException e){
 			e.printStackTrace();
 		}
+		
+		ArrayList<ArrayList<Lamp>> totalCombo = new ArrayList<ArrayList<Lamp>>();
+		int n = lampsList.size();
+		//find every combination of items in the list of lamp items
+		for(int i = 1; i <= n; i++){
+			totalCombo.addAll(lampCombinations(lampsList, n, i));
+		}
 
-		return lampCombinations;
+		ArrayList<ArrayList<Lamp>> componentCombos = new ArrayList<ArrayList<Lamp>>();
+		//find all the combinations that satisfy all the components
+		for(ArrayList<Lamp> lampCombo : totalCombo){
+			//counters for components are used for checking to see if the combination
+			//can satisfy the requested quantity
+			boolean baseFound = false;
+			int baseCount = 0;
+			boolean bulbFound = false;
+			int bulbCount = 0;
+			//search the current combination for a base
+			for(Lamp lmp : lampCombo){
+				if(lmp.getBase().compareToIgnoreCase("Y") == 0){
+					baseFound = true;
+					baseCount++;
+				}
+			}
+			//search the current combination for a bulb
+			for(Lamp lmp : lampCombo){
+				if(lmp.getBulb().compareToIgnoreCase("Y") == 0){
+					bulbFound = true;
+					bulbCount++;
+				}
+			}
+			//if both components are found, add to componentCombos
+			if(baseFound && bulbFound && baseCount >= quantity && bulbCount >= quantity){
+				componentCombos.add(lampCombo);
+			}
+		}
+		//if combinations with all components were found sort them to get the
+		//lowest price
+		if(componentCombos.size() > 0){
+			//search for the combinations with the lowest price
+			//sort the all the combonations and add the first elements to a list of size quantity
+			for(int i = 0; i < componentCombos.size(); i++){
+				ArrayList<Lamp> lampComboI = componentCombos.get(i);
+				int priceI = 0;
+				//calculate the price for combination i
+				for(Lamp lmp : lampComboI){
+					priceI += lmp.getPrice();
+				}
+				//sort the array by the smallest total price
+				for(int j = i + 1; j < componentCombos.size(); j++){
+					ArrayList<Lamp> lampComboJ = componentCombos.get(j);
+					int priceJ = 0;
+					//calculate the price for combination i
+					for(Lamp lmp : lampComboJ){
+						priceJ += lmp.getPrice();
+					}
+					
+					if(priceI > priceJ){
+						//swap elements i and j
+						Collections.swap(componentCombos, i, j);
+					}
+				}
+			}
+			//add the items from the first combination to the orderList
+			for(Lamp lmp : componentCombos.get(0)){
+				orderList.add(lmp);
+				System.out.println(lmp.getID());
+			}
+		}
+		else{
+			System.out.println("Your order cannot be fulfilled based on our inventory");
+			System.out.println("The suggested manufacturers are: ");
+
+			for(Manufacturer manu : this.manufacturerList){
+				System.out.println(manu.getName());
+			}
+			//return empty orderList
+			orderList.clear();
+		}
+		return orderList;
+	}
+
+	public ArrayList<ArrayList<Lamp>> lampCombinations(ArrayList<Lamp> lampArray, int n, int r){
+		ArrayList<Lamp> tempData = new ArrayList<Lamp>();
+		ArrayList<ArrayList<Lamp>> partialLampList = new ArrayList<ArrayList<Lamp>>();
+
+		combinationLampUtil(lampArray, tempData, partialLampList, 0, n - 1, 0, r);
+		return partialLampList;
+	}
+
+	public void combinationLampUtil(ArrayList<Lamp> arr, ArrayList<Lamp> tempData, ArrayList<ArrayList<Lamp>> partialList, int start, int end, int index, int r){
+		//current combination is ready to be added
+		if(index == r){
+			ArrayList<Lamp> tempLampArray = new ArrayList<>();
+			
+			for(int i = 0; i < r; i++){
+				tempLampArray.add(tempData.get(i));
+			}
+			partialList.add(tempLampArray);
+
+			return;
+		}
+		// replace index with all possible elements. The condition
+        // "end-i+1 >= r-index" makes sure that including one element
+        // at index will make a combination with remaining elements
+        // at remaining positions
+		for (int i = start; i <= end && end - i + 1 >= r - index; i++){
+            tempData.add(index, arr.get(i));
+            //combinationTest.add(data);
+            combinationLampUtil(arr, tempData, partialList, i + 1, end, index + 1, r);
+        }
+	}	
+
+	public void deleteItem(ArrayList<String> itemID, String furnitureCategory){
+		try{
+			String query = "DELETE FROM " + furnitureCategory.toLowerCase() + " WHERE ID = ?";
+			PreparedStatement myStatement = inventoryConnection.prepareStatement(query);
+			for(String id : itemID){
+				myStatement.setString(1, id);
+				myStatement.executeUpdate();
+			}
+			myStatement.close();
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+		}
 	}
 
 	public void createOrderForm(String orderRequest, ArrayList<String> itemID, int totalPrice){
 		FileWriter orderForm = null;
 		String outputFileName = "orderform.txt";
-
 		try{
 			//open an output stream for the orderform
 			orderForm = new FileWriter(outputFileName);
@@ -217,6 +729,7 @@ public class FurnitureStore {
 			if(orderForm != null){
 				try{
 					orderForm.close();
+					System.out.println("The order Form is ready in the project directory");
 				}
 				catch(IOException e){
 					System.out.println("Couldn't close file " + outputFileName);
@@ -224,7 +737,6 @@ public class FurnitureStore {
 				}
 			}
 		}
-
 	}
 	
 	//used for closing the connection to the inventory database
@@ -232,7 +744,6 @@ public class FurnitureStore {
 		try{
 			inventoryConnection.close();
 		}
-		
 		catch(SQLException e){
 			e.printStackTrace();
 		}
@@ -253,7 +764,7 @@ public class FurnitureStore {
 		System.out.println("MySQL URL: " + dbURL);
 		System.out.println("Username: " + dbUsername);
 		System.out.println("Password: " + dbPassword);
-
+		/*
 		System.out.print("Would you like to change these settings? (Enter yes to input new MySQL settings or no to use the current one) ");
 		userRequest = scanner.nextLine().trim();
 		
@@ -280,7 +791,7 @@ public class FurnitureStore {
 				System.out.println(e.getMessage());
 			}
 		}
-		
+		*/
 		FurnitureStore schoolFurnitureStore = new FurnitureStore(dbURL, dbUsername, dbPassword);
 		schoolFurnitureStore.createConnection();
 		
@@ -333,36 +844,63 @@ public class FurnitureStore {
 
 				//check if the furniture category exists with in the store
 				if(userFurnitureRequest[1].compareToIgnoreCase("chair") == 0){
-					ArrayList<Chair> testChair = schoolFurnitureStore.calculateChairPrice(userFurnitureRequest[0], userQuantity);
+					ArrayList<Chair> chairResult = schoolFurnitureStore.calculateChairPrice(userFurnitureRequest[0], userQuantity);
+					itemID.clear();	//clears the id list from its last use
 					
-					for(int i = 0; i < testChair.size(); i++){
-						System.out.println(testChair.get(i).getID());
-						itemID.add(testChair.get(i).getID());
-						totalPrice += testChair.get(i).getPrice();
+					//check to see if the calculatePrice found combinations
+					if(chairResult.size() > 0){
+						for(int i = 0; i < chairResult.size(); i++){
+							itemID.add(chairResult.get(i).getID());
+							totalPrice += chairResult.get(i).getPrice();
+						}
+						//call orderform method to create the order form
+						schoolFurnitureStore.createOrderForm(furnitureOrdered, itemID, totalPrice);
+						schoolFurnitureStore.deleteItem(itemID, userFurnitureRequest[1]);
 					}
-					
-					//test orderform method
-					schoolFurnitureStore.createOrderForm(furnitureOrdered, itemID, totalPrice);
 				}
 				else if(userFurnitureRequest[1].compareToIgnoreCase("desk") == 0){
-					ArrayList<Desk> testDesk = schoolFurnitureStore.calculateDeskPrice(userFurnitureRequest[0], userQuantity);
-					
-					for(int i = 0; i < testDesk.size(); i++){
-						System.out.println(testDesk.get(i).getID());
+					ArrayList<Desk> deskResult = schoolFurnitureStore.calculateDeskPrice(userFurnitureRequest[0], userQuantity);
+					itemID.clear();	//clears the id list from its last use
+				
+					//check to see if the calculatePrice found combinations
+					if(deskResult.size() > 0){
+						for(int i = 0; i < deskResult.size(); i++){
+							itemID.add(deskResult.get(i).getID());
+							totalPrice += deskResult.get(i).getPrice();
+						}
+						//call orderform method to create the order form
+						schoolFurnitureStore.createOrderForm(furnitureOrdered, itemID, totalPrice);
+						schoolFurnitureStore.deleteItem(itemID, userFurnitureRequest[1]);
 					}
 				}
 				else if(userFurnitureRequest[1].compareToIgnoreCase("filing") == 0){
-					ArrayList<Filing> testFiling = schoolFurnitureStore.calculateFilingPrice(userFurnitureRequest[0], userQuantity);
-					
-					for(int i = 0; i < testFiling.size(); i++){
-						System.out.println(testFiling.get(i).getID());
+					ArrayList<Filing> filingResult = schoolFurnitureStore.calculateFilingPrice(userFurnitureRequest[0], userQuantity);
+					itemID.clear();	//clears the id list from its last use
+
+					//check to see if the calculatePrice found combinations
+					if(filingResult.size() > 0){
+						for(int i = 0; i < filingResult.size(); i++){
+							itemID.add(filingResult.get(i).getID());
+							totalPrice += filingResult.get(i).getPrice();
+						}
+						//call orderform method to create the order form
+						schoolFurnitureStore.createOrderForm(furnitureOrdered, itemID, totalPrice);
+						schoolFurnitureStore.deleteItem(itemID, userFurnitureRequest[1]);
 					}
 				}
 				else if(userFurnitureRequest[1].compareToIgnoreCase("lamp") == 0){
-					ArrayList<Lamp> testLamp = schoolFurnitureStore.calculateLampPrice(userFurnitureRequest[0], userQuantity);
-					
-					for(int i = 0; i < testLamp.size(); i++){
-						System.out.println(testLamp.get(i).getID());
+					ArrayList<Lamp> lampResult = schoolFurnitureStore.calculateLampPrice(userFurnitureRequest[0], userQuantity);
+					itemID.clear();	//clears the id list from its last use
+
+					//check to see if the calculatePrice found combinations
+					if(lampResult.size() > 0){
+						for(int i = 0; i < lampResult.size(); i++){
+							itemID.add(lampResult.get(i).getID());
+							totalPrice += lampResult.get(i).getPrice();
+						}
+						//call orderform method to create the order form
+						schoolFurnitureStore.createOrderForm(furnitureOrdered, itemID, totalPrice);
+						schoolFurnitureStore.deleteItem(itemID, userFurnitureRequest[1]);
 					}
 				}
 				else{
