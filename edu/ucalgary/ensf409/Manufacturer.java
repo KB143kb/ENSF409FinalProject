@@ -1,3 +1,10 @@
+/**
+  @author      nathaniel lipura <a href="mailto:nathaniel.lipura@ucalgary.ca">nathaniel.lipura@ucalgary.ca</a>
+  @author      kruti bhatt <a href="mailto:kruti.bhatt1@ucalgary.ca">kruti.bhatt1@ucalgary.ca</a>
+  @version     1.0
+  @since       1.0
+*/
+ 
 package edu.ucalgary.ensf409;
 
 
@@ -15,7 +22,7 @@ public class Manufacturer
 		setPhoneNumber (phoneNumber);
 		setProvince (province);
 	}
-	
+	//Manufacturer setter methods
 	public void setID (String id)
 	{
 		this.manuID = id;
@@ -35,7 +42,7 @@ public class Manufacturer
 	{
 		this.province = province;
 	}
-	
+	//Manufacturer getter methods
 	public String getID () 
 	{
 		return this.manuID;

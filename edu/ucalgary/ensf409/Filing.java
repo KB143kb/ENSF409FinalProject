@@ -1,3 +1,10 @@
+/**
+  @author      nathaniel lipura <a href="mailto:nathaniel.lipura@ucalgary.ca">nathaniel.lipura@ucalgary.ca</a>
+  @author      kruti bhatt <a href="mailto:kruti.bhatt1@ucalgary.ca">kruti.bhatt1@ucalgary.ca</a>
+  @version     1.0
+  @since       1.0
+*/
+
 package edu.ucalgary.ensf409;
 
 public class Filing 
@@ -20,7 +27,7 @@ public class Filing
 		setPrice (price);
 		setManuID (manuID);
 	}
-	
+	//Filing setter methods
 	public void setID (String id)
 	{
 		this.id = id;
@@ -55,7 +62,7 @@ public class Filing
 	{
 		this.manuID = manuID;
 	}
-	
+	//Filing getter methods
 	public String getID () 
 	{
 		return this.id;

@@ -1,3 +1,10 @@
+/**
+  @author      nathaniel lipura <a href="mailto:nathaniel.lipura@ucalgary.ca">nathaniel.lipura@ucalgary.ca</a>
+  @author      kruti bhatt <a href="mailto:kruti.bhatt1@ucalgary.ca">kruti.bhatt1@ucalgary.ca</a>
+  @version     1.0
+  @since       1.0
+*/
+
 package edu.ucalgary.ensf409;
 
 
@@ -23,7 +30,7 @@ public class Chair
 		setPrice (price);
 		setManuID (manuID);
 	}
-	
+	//Chair setter methods
 	public void setID (String id)
 	{
 		this.id = id;
@@ -63,7 +70,7 @@ public class Chair
 	{
 		this.manuID = manuID;
 	}
-	
+	//Chair getter methods
 	public String getID () 
 	{
 		return this.id;

@@ -1,3 +1,10 @@
+/**
+  @author      nathaniel lipura <a href="mailto:nathaniel.lipura@ucalgary.ca">nathaniel.lipura@ucalgary.ca</a>
+  @author      kruti bhatt <a href="mailto:kruti.bhatt1@ucalgary.ca">kruti.bhatt1@ucalgary.ca</a>
+  @version     1.0
+  @since       1.0
+*/
+
 /*
  *	To compile: javac -cp .;lib/mysql-connector-java-8.0.23.jar;. edu/ucalgary/ensf409/FurnitureStore.java
  *	To run: java -cp .;lib/mysql-connector-java-8.0.23.jar;. edu/ucalgary/ensf409/FurnitureStore 
@@ -23,12 +30,6 @@ public class FurnitureStore {
 	public String USERNAME;
 	public String PASSWORD;
 	private Connection inventoryConnection;
-	/*
-	private ResultSet chairInventory;
-	private ResultSet deskInventory;
-	private ResultSet filingInventory;
-	private ResultSet lampInventory;
-	*/
 	private ArrayList<Manufacturer> manufacturerList = new ArrayList<Manufacturer>();
 	
 	

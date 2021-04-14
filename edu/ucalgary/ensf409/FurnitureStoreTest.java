@@ -1,7 +1,14 @@
+/**
+  @author      nathaniel lipura <a href="mailto:nathaniel.lipura@ucalgary.ca">nathaniel.lipura@ucalgary.ca</a>
+  @author      kruti bhatt <a href="mailto:kruti.bhatt1@ucalgary.ca">kruti.bhatt1@ucalgary.ca</a>
+  @version     1.0
+  @since       1.0
+*/
+
 /*
  *	To compile: javac -cp .;lib/junit-4.13.2.jar;lib/hamcrest-core-1.3.jar;lib/mysql-connector-java-8.0.23.jar edu/ucalgary/ensf409/FurnitureStoreTest.java 
  *	To run: java -cp .;lib/junit-4.13.2.jar;lib/hamcrest-core-1.3.jar;lib/mysql-connector-java-8.0.23.jar org.junit.runner.JUnitCore edu.ucalgary.ensf409.FurnitureStoreTest
- */
+*/
 
 package edu.ucalgary.ensf409;
 
@@ -14,8 +21,8 @@ import java.util.ArrayList;
 public class FurnitureStoreTest 
 {
 	public final static String DBURL = "jdbc:mysql://localhost/inventory";
-	public final static String USERNAME = "root";
-	public final static String PASSWORD = "Kruti#123";
+	public final static String USERNAME = "scm";
+	public final static String PASSWORD = "ensf409";
 	public static FurnitureStore schoolFurnitureStore;
 	public final static String outputFileName = "testOrderform.txt";
 	
@@ -59,13 +66,6 @@ public class FurnitureStoreTest
 			System.out.println("testCreateConnection successful.");
 		}
 		
-		/*
-		@Test(expected=IllegalArgumentException.class)
-		public void testCreateConnection_Exception ()
-		{
-			
-		}*/
-		
 	//It is important for MySQL code to be refreshed or recreated before Unit Testing the FurnitureStore code. 
 	//Testing whether CalculateChairPrice works after connecting with MySQL.
 		//Testing whether CalculateChairPrice.
@@ -75,7 +75,7 @@ public class FurnitureStoreTest
 			FurnitureStore schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
 			schoolFurnitureStore.createConnection();
 			ArrayList<Chair> chairResult = schoolFurnitureStore.calculateChairPrice ("Mesh", 1);		
-			assertEquals ("C0942", chairResult.get(0).getID());
+			assertEquals ("C6748", chairResult.get(0).getID());
 			schoolFurnitureStore.close();
 			System.out.println("testCalculateChairPrice successful.");
 		}
