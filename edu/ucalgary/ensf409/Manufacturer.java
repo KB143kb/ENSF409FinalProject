@@ -56,3 +56,4 @@ public class Manufacturer
 		return this.province;
 	}
 }
+
