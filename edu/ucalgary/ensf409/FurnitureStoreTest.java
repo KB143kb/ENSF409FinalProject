@@ -178,7 +178,7 @@ public class FurnitureStoreTest
 			System.out.println("testCalculateFilingPriceDifferentQuality successful.");
 		}
 		
-		//Testing whether CalculateLampPrice works after connecting with MySQL.
+	//Testing whether CalculateLampPrice works after connecting with MySQL.
 		//Testing whether CalculateLampPrice.
 		@Test
 		public void testCalculateLampPrice ()
