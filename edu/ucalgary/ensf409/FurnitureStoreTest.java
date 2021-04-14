@@ -93,4 +93,13 @@ public class FurnitureStoreTest
 			assertEquals ("L564", lampResult.get(0).getID());
 			schoolFurnitureStore.close();
 		}
+	
+		/*
+		@Test
+		public void testClose () throws SQLException
+		{
+			schoolFurnitureStore.close();
+			assertNull(schoolFurnitureStore.getInventoryConnection());
+		}
+		*/
 }
