@@ -637,7 +637,6 @@ public class FurnitureStore {
 			//add the items from the first combination to the orderList
 			for(Lamp lmp : componentCombos.get(0)){
 				orderList.add(lmp);
-				System.out.println(lmp.getID());
 			}
 		}
 		else{
