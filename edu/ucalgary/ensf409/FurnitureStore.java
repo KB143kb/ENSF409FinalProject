@@ -1,6 +1,10 @@
 /*
  *	To compile: javac -cp .;lib/mysql-connector-java-8.0.23.jar;. edu/ucalgary/ensf409/FurnitureStore.java
  *	To run: java -cp .;lib/mysql-connector-java-8.0.23.jar;. edu/ucalgary/ensf409/FurnitureStore 
+ *	
+ * 	References:
+ *		the combination methods were adapted from https://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
+ *		the sorting calculations were adapted from https://www.javatpoint.com/java-program-to-find-smallest-number-in-an-array
  */
 
 
@@ -751,8 +755,8 @@ public class FurnitureStore {
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		boolean readingUser = true;
-		String dbUsername = "root";
-		String dbPassword = "Kruti#123";
+		String dbUsername = "nathan";
+		String dbPassword = "ensf409";
 		String dbURL = "jdbc:mysql://localhost/inventory";
 		String userRequest = "";
 
@@ -763,7 +767,7 @@ public class FurnitureStore {
 		System.out.println("MySQL URL: " + dbURL);
 		System.out.println("Username: " + dbUsername);
 		System.out.println("Password: " + dbPassword);
-		/*
+		
 		System.out.print("Would you like to change these settings? (Enter yes to input new MySQL settings or no to use the current one) ");
 		userRequest = scanner.nextLine().trim();
 		
@@ -790,7 +794,7 @@ public class FurnitureStore {
 				System.out.println(e.getMessage());
 			}
 		}
-		*/
+		
 		FurnitureStore schoolFurnitureStore = new FurnitureStore(dbURL, dbUsername, dbPassword);
 		schoolFurnitureStore.createConnection();
 		
