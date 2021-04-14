@@ -214,15 +214,4 @@ public class FurnitureStoreTest
 			schoolFurnitureStore.close();
 			System.out.println("testCalculateLampPriceDifferentQuality successful.");
 		}
-		
-	//Testing whether MySQL was successfully closed after connecting. User might need to change USERNAME/PASSWORD 
-	//as well as DBURL according to their device. 
-		@Test
-		public void testClose () throws SQLException
-		{
-			schoolFurnitureStore = new FurnitureStore(DBURL, USERNAME, PASSWORD);
-			schoolFurnitureStore.createConnection();
-			schoolFurnitureStore.close();
-			assertNull(schoolFurnitureStore.getInventoryConnection());
-		}
 }
